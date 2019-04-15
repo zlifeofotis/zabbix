@@ -1,0 +1,60 @@
+
+./configure --enable-server --enable-agent --with-mysql --with-net-snmp --with-libcurl --with-libxml2 --prefix=/usr/local/zabbix
+
+安装zabbix所需安装的库：
+curl curl-devel net-snmp net-snmp-devel perl-DBI php-gd php-xml php-bcmath
+
+zabbix编译参数：
+--enable-server --enable-agent --with-mysql --with-net-snmp --with-libcurl
+
+mysql安装包：
+mysql mysql-devel php-mysql
+
+php.ini:
+post_max_size = 8M 改为 16M 
+max_execution_time = 30 改为 300 
+max_input_time = 60 改为 300 
+date.timezone = "Asia/Chongqing"
+
+邮件报警:
+
+修改/etc/mail.rc,添加:
+
+set from=12345678@qq.com
+set smtp=smtp.qq.com
+set smtp-auth-user=12345678@qq.com
+set smtp-auth-password=xxxxxxxxxxxxxxxx
+set smtp-auth=login
+set smtp-use-starttls
+set ssl-verify=ignore
+set nss-config-dir=/etc/pki/nssdb
+
+
+创建文件/usr/local/zabbix/bin/sendmail.sh:
+
+#!/bin/bash
+to=$1
+subject=$2
+body=`echo "$3" | tr -d '\r'`
+ 
+cat <<EOF | mail -s "$subject" "$to"
+$body
+EOF
+
+/usr/local/zabbix/bin/sms.sh:
+
+#!/bin/bash
+
+body=`echo "$1" | tr -d '\r'`
+
+/usr/bin/curl -d "action=send&userid=888&account=xxx&password=123456&mobile=17700000000" --data-urlencode "content=【芝蔴街】$body" http://120.79.149.129:7799/sms.aspx 
+
+
+
+
+
+
+
+
+
+
